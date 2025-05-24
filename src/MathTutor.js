@@ -1,32 +1,29 @@
-// b/src/App.js
+// b/src/MathTutor.js
 import React, { useState } from 'react';
 import { fetchAIResponse } from './Api';
-import axios from 'axios';
 
-function App() {
+export default function MathTutor() {
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
   const [latency, setLatency] = useState(null);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log('⏱️ handleSubmit fired');
-      const start = performance.now();                // NEW
+      const start = performance.now();              
       const data = await fetchAIResponse(query);
       const took = ((performance.now() - start) / 1000).toFixed(2);
-      console.log('⏱️ computed latency:', took);
       setLatency(took);
       axios.post('http://localhost:8000/metrics/latency/', {
         page: 'home',
         latency: parseFloat(took),
         timestamp: new Date().toISOString()
-      }).catch(console.error);                              // NEW
+      }).catch(console.error); 
       setResponse(data.response);
-    } catch (error) {
-      console.error('Error fetching AI response:', error);
+    } catch (err) {
+      console.error(err);
       setResponse('Error: could not fetch response.');
     } finally {
       setLoading(false);
@@ -34,24 +31,23 @@ function App() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 20, position: 'relative' }}>
       {latency && <div className="latency-badge">Latency: {latency}s</div>}
-      <h1>AI Chat</h1>
+      <h1>Math Tutor</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ask something..."
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Enter math problem..."
         />
-        <button type="submit">Send</button>
+        <button type="submit">Solve</button>
       </form>
-
       {loading
         ? <p>Loading…</p>
         : (
             <>
-              <p>Response: {response}</p>
+              <p>Answer: {response}</p>
               {latency && <p style={{ fontSize: '0.9em', color: '#666' }}>
                 (Latency: {latency}s)
               </p>}
@@ -61,5 +57,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
