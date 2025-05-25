@@ -6,6 +6,7 @@ export default function BookSummarizer() {
   const [file, setFile] = useState(null);
   const [summary, setSummary] = useState('');
   const [loading, setLoading] = useState(false);
+  const [latency, setLatency] = useState(null);
 
   const handleFileChange = e => setFile(e.target.files[0]);
 
@@ -19,7 +20,7 @@ export default function BookSummarizer() {
 
     try {
       const { data } = await axios.post(
-        'http://localhost:8000/summary/upload/',
+        '',
         form,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );

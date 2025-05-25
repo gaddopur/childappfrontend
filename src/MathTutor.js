@@ -1,5 +1,6 @@
 // b/src/MathTutor.js
 import React, { useState } from 'react';
+import axios from 'axios';
 import { fetchAIResponse } from './Api';
 
 export default function MathTutor() {
