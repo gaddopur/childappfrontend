@@ -1,6 +1,7 @@
 // b/src/MathTutor.js
 import React, { useState } from 'react';
-import { fetchAIResponse } from './Api';
+import { solverMathProblem } from './Api';
+import axios from "axios";
 
 export default function MathTutor() {
   const [query, setQuery] = useState('');
@@ -13,7 +14,7 @@ export default function MathTutor() {
     setLoading(true);
     try {
       const start = performance.now();              
-      const data = await fetchAIResponse(query);
+      const data = await solverMathProblem(query);
       const took = ((performance.now() - start) / 1000).toFixed(2);
       setLatency(took);
       axios.post('http://localhost:8000/metrics/latency/', {
