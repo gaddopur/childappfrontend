@@ -1,6 +1,6 @@
 // b/src/BookSummarizer.js
 import React, { useState } from 'react';
-import axios from 'axios';
+import { summarizePdf, postLatencyMetric } from './Api';
 
 export default function BookSummarizer() {
   const [file, setFile] = useState(null);
@@ -14,24 +14,17 @@ export default function BookSummarizer() {
     e.preventDefault();
     if (!file) return setSummary('Please choose a file first.');
     setLoading(true);
-    let start = performance.now();
-    const form = new FormData();
-    form.append('file', file);
-
+    const start = performance.now();
     try {
-      const { data } = await axios.post(
-        '',
-        form,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
+      const data = await summarizePdf(file);
       const took = ((performance.now() - start) / 1000).toFixed(2);
       setLatency(took);
-      axios.post('http://localhost:8000/metrics/latency/', {
-        page: 'home',           // use 'math' or 'summarizer' as appropriate
-        latency: parseFloat(took),
-        timestamp: new Date().toISOString()
-      }).catch(console.error);
-      setSummary(data.summary);
+
+      // record latency (reuse your helper)
+      postLatencyMetric('pdf_summarizer', parseFloat(took)).catch(console.error);
+
+      // note: your DRF view returns { message: ..., content: summary }
+      setSummary(data.content);
     } catch (err) {
       console.error(err);
       setSummary('Error: failed to summarize.');
